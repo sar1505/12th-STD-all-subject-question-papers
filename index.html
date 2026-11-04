@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunrise Academy | Class 12 Question Paper Generator</title>
+<style>
+:root{--blue:#174a85;--light:#eef4fb;--border:#d5dfeb;--text:#172536}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f7fb;color:var(--text);font-family:Arial,sans-serif}
+header{background:linear-gradient(120deg,#12345c,#2871b8);color:white;text-align:center;padding:25px 14px}
+header h1{font-size:clamp(22px,5vw,32px);margin:0 0 8px}
+header p{margin:0;font-size:14px}
+main{max-width:1100px;margin:18px auto;padding:0 12px;display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:16px}
+.card{background:white;border:1px solid var(--border);border-radius:13px;padding:16px;box-shadow:0 3px 12px #142d4b0b}
+h2{font-size:19px;color:var(--blue);margin:0 0 14px}
+label{display:block;font-weight:bold;font-size:13px;margin:12px 0 5px}
+select,input,textarea{width:100%;padding:10px;border:1px solid #bdcbdc;border-radius:8px;font:inherit;background:#fff}
+select[multiple]{min-height:150px}
+.small{font-size:12px;color:#66758a;line-height:1.5}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button{border:0;border-radius:8px;background:var(--blue);color:white;padding:11px 14px;font-weight:bold;cursor:pointer}
+button.alt{background:#e8eff8;color:#173d6b}
+.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.paperhead{text-align:center;border-bottom:2px solid #233c5c;padding-bottom:12px}
+.paperhead h2{margin-bottom:5px}
+.meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px;margin-top:12px}
+.section{margin-top:18px}
+.section h3{font-size:15px;color:var(--blue);border-bottom:1px solid var(--border);padding-bottom:7px}
+.question{line-height:1.55;margin:12px 0}
+footer{text-align:center;font-size:12px;color:#68778b;padding:20px}
+@media(max-width:780px){main{grid-template-columns:1fr}}
+@media print{body{background:white}header,.settings,.no-print,footer{display:none!important}main{display:block;margin:0;padding:0}.card{border:0;box-shadow:none;padding:0}.paper{display:block!important}}
+</style>
+</head>
+<body>
+<header>
+<h1>SUNRISE ACADEMY</h1>
+<p>12th Standard Question Paper Generator · Tamil Nadu State Board</p>
+</header>
+<main>
+<section class="card settings">
+<h2>Paper Settings</h2>
+<label for="subject">Select Subject</label>
+<select id="subject"></select>
+<label for="medium">Medium</label>
+<select id="medium"><option>English</option><option>தமிழ்</option></select>
+<label for="exam">Examination</label>
+<select id="exam">
+<option>Practice Test</option><option>Unit Test</option><option>Monthly Test</option>
+<option>Quarterly Examination</option><option>Half-Yearly Examination</option>
+<option>Revision Test</option><option>Model Examination</option>
+</select>
+<label for="chapters">Select Chapters</label>
+<select id="chapters" multiple></select>
+<p class="small">Choose one or more chapters. To include the full listed syllabus, select “All Chapters”.</p>
+<div class="two">
+<div><label for="duration">Duration</label><select id="duration"><option>1 Hour</option><option>1.5 Hours</option><option selected>3 Hours</option></select></div>
+<div><label for="maximum">Maximum Marks</label><input id="maximum" type="number" min="1" value="100"></div>
+</div>
+<label>Number of Questions</label>
+<div class="counts">
+<div><label for="n1">1-mark</label><input id="n1" type="number" min="0" value="15"></div>
+<div><label for="n2">2-mark</label><input id="n2" type="number" min="0" value="6"></div>
+<div><label for="n3">3-mark</label><input id="n3" type="number" min="0" value="6"></div>
+<div><label for="n5">5-mark</label><input id="n5" type="number" min="0" value="7"></div>
+</div>
+<p class="small" id="calculation">Question total: 68 marks. Adjust the counts to match your required exam pattern.</p>
+<div class="buttons no-print"><button id="generate">Generate Question Paper</button><button class="alt" id="reset">Reset</button></div>
+<hr style="border:0;border-top:1px solid #e1e7ef;margin:18px 0">
+<h2>Add Your Questions</h2>
+<p class="small">The generator needs a question bank to create real textbook-based papers. Paste your own verified questions in JSON format below, then tap Import.</p>
+<textarea id="bank" rows="6" placeholder='[{"subject":"Mathematics","chapter":"Applications of Matrices and Determinants","marks":1,"question":"Enter your question here"}]'></textarea>
+<div class="buttons no-print"><button class="alt" id="import">Import Question Bank</button></div>
+<p class="small" id="status">No custom questions added yet.</p>
+</section>
+
+<section class="card paper" id="paper">
+<div class="paperhead">
+<h2>QUESTION PAPER</h2>
+<strong>TAMIL NADU STATE BOARD · CLASS XII</strong>
+<div id="examTitle">PRACTICE TEST</div>
+<div class="meta"><span id="subjectTitle">Subject: Mathematics</span><span id="durationTitle">Duration: 3 Hours</span><span id="marksTitle">Maximum Marks: 100</span></div>
+</div>
+<p><b>Instructions:</b> Answer the questions as directed. Show the necessary steps wherever required.</p>
+<div id="output"><p class="small">Choose a subject and chapters, then tap “Generate Question Paper”.</p></div>
+<div class="buttons no-print"><button id="print">Print / Save as PDF</button><button class="alt" id="download">Download as TXT</button></div>
+</section>
+</main>
+<footer>Teacher-use template. Check the latest official syllabus and subject-wise public examination blueprint before using.</footer>
+<script>
+const syllabus={
+"Mathematics":["Applications of Matrices and Determinants","Complex Numbers","Theory of Equations","Inverse Trigonometric Functions","Two Dimensional Analytical Geometry","Applications of Vector Algebra","Applications of Differential Calculus","Differentials and Partial Derivatives","Applications of Integration","Ordinary Differential Equations","Probability Distributions","Discrete Mathematics"],
+"Physics":["Electrostatics","Current Electricity","Magnetism and Magnetic Effects of Electric Current","Electromagnetic Induction and Alternating Current","Electromagnetic Waves","Ray Optics","Wave Optics","Dual Nature of Radiation and Matter","Atomic and Nuclear Physics","Electronics and Communication"],
+"Chemistry":["Metallurgy","p-Block Elements","Transition and Inner Transition Elements","Coordination Chemistry","Solid State","Chemical Kinetics","Ionic Equilibrium","Electro Chemistry","Surface Chemistry","Carbonyl Compounds and Carboxylic Acids","Organic Nitrogen Compounds","Biomolecules"],
+"Bio-Botany":["Asexual and Sexual Reproduction in Plants","Classical Genetics","Chromosomal Basis of Inheritance","Principles of Inheritance and Variation","Molecular Genetics","Evolution","Plant Breeding","Biotechnology","Applications of Biotechnology","Ecology"],
+"Bio-Zoology":["Reproduction in Organisms","Human Reproduction","Reproductive Health","Principles of Inheritance and Variation","Molecular Genetics","Evolution","Human Health and Diseases","Microbes in Human Welfare","Applications of Biotechnology","Organisms and Populations"],
+"Computer Science":["Function","Data Abstraction","Data Structures","Database Concepts","SQL","Python Fundamentals","Python Functions","Data Visualization","Computer Networks","Cyber Security"],
+"Computer Applications":["Introduction to JavaScript","Web Designing","Database Concepts","Computer Networks","E-Commerce","Cyber Security"],
+"Commerce":["Principles of Management","Functions of Management","Financial Markets","Human Resource Management","Marketing","Consumer Protection","Business Environment"],
+"Accountancy":["Accounts from Incomplete Records","Accounting for Not-for-Profit Organisation","Partnership Accounts","Company Accounts","Ratio Analysis","Cash Flow Statement"],
+"Economics":["Introduction to Macro Economics","National Income","Theories of Employment and Income","Consumption and Investment Functions","Monetary Economics","Banking","International Economics","Fiscal Economics","Environmental Economics"],
+"Business Mathematics and Statistics":["Applications of Matrices and Determinants","Differential Calculus","Integral Calculus","Probability Distributions","Sampling Techniques","Statistical Quality Control"],
+"Political Science":["Political Science: An Introduction","Constitution of India","Forms of Government","Democracy","Local Governments","Political Ideologies"],
+"History":["Rise of Nationalism","Imperialism","World War I","World War II","United Nations","Contemporary World"]
+};
+let questionBank=[];
+const el=id=>document.getElementById(id);
+function loadSubjects(){
+ el("subject").innerHTML=Object.keys(syllabus).map(s=>`<option>${s}</option>`).join("");
+ loadChapters();
+}
+function loadChapters(){
+ const list=syllabus[el("subject").value]||[];
+ el("chapters").innerHTML='<option value="__ALL__">All Chapters</option>'+list.map(c=>`<option>${c}</option>`).join("");
+}
+el("subject").addEventListener("change",loadChapters);
+function chosenChapters(){
+ const selected=[...el("chapters").selectedOptions].map(o=>o.value);
+ return (!selected.length||selected.includes("__ALL__"))?syllabus[el("subject").value]:selected;
+}
+function calc(){
+ const total=+el("n1").value+2*+el("n2").value+3*+el("n3").value+5*+el("n5").value;
+ el("calculation").textContent=`Question total: ${total} marks. Target maximum: ${el("maximum").value} marks.`;
+}
+["n1","n2","n3","n5","maximum"].forEach(id=>el(id).addEventListener("input",calc));
+function generate(){
+ const subject=el("subject").value, chapters=chosenChapters();
+ const types=[1,2,3,5], ids={1:"n1",2:"n2",3:"n3",5:"n5"};
+ let total=types.reduce((sum,m)=>sum+m*Number(el(ids[m]).value),0),number=1,html="";
+ el("examTitle").textContent=el("exam").value.toUpperCase();
+ el("subjectTitle").textContent=`Subject: ${subject} (${el("medium").value})`;
+ el("durationTitle").textContent=`Duration: ${el("duration").value}`;
+ el("marksTitle").textContent=`Maximum Marks: ${total}`;
+ types.forEach((marks,index)=>{
+  const count=Number(el(ids[marks]).value); if(!count)return;
+  html+=`<div class="section"><h3>SECTION ${String.fromCharCode(65+index)} — ${marks} MARK${marks===1?"":"S"}</h3>`;
+  for(let i=0;i<count;i++){
+   const chapter=chapters[(i+index)%chapters.length];
+   const found=questionBank.filter(q=>q.subject===subject&&q.chapter===chapter&&Number(q.marks)===marks);
+   const question=found.length?found[i%found.length].question:`[Add a verified ${marks}-mark question from "${chapter}" to your question bank.]`;
+   html+=`<div class="question"><b>${number++}.</b> ${question}<span style="float:right">(${marks})</span></div>`;
+  }
+  html+="</div>";
+ });
+ el("output").innerHTML=html;
+}
+el("generate").onclick=generate;
+el("print").onclick=()=>window.print();
+el("reset").onclick=()=>{
+ ["n1","n2","n3","n5"].forEach((id,i)=>el(id).value=[15,6,6,7][i]);
+ el("maximum").value=100;[...el("chapters").options].forEach(o=>o.selected=false);
+ el("output").innerHTML='<p class="small">Choose chapters and generate a paper.</p>';calc();
+};
+el("import").onclick=()=>{
+ try{
+  const parsed=JSON.parse(el("bank").value);
+  if(!Array.isArray(parsed))throw Error("Please enter a JSON array.");
+  parsed.forEach(q=>{if(!q.subject||!q.chapter||!q.marks||!q.question)throw Error("Each question needs subject, chapter, marks and question.");});
+  questionBank=questionBank.concat(parsed);
+  el("status").textContent=`Imported ${parsed.length} questions. Total in this session: ${questionBank.length}.`;
+ }catch(e){el("status").textContent="Import error: "+e.message;}
+};
+el("download").onclick=()=>{
+ const content="SUNRISE ACADEMY\n"+el("examTitle").textContent+"\n"+el("subjectTitle").textContent+"\n"+el("durationTitle").textContent+"\n"+el("marksTitle").textContent+"\n\n"+el("output").innerText;
+ const blob=new Blob([content],{type:"text/plain"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="12th-standard-question-paper.txt";a.click();URL.revokeObjectURL(a.href);
+};
+loadSubjects();calc();
+</script>
+</body></html>
